@@ -118,7 +118,10 @@ class MediaListActivity : BaseActivity() {
                 b.toolbar.menu.findItem(it)?.isVisible = hasBucket
             }
         }
+        tintBar(b.toolbar)
     }
+
+    private fun anchor(id: Int): View = b.toolbar.findViewById<View>(id) ?: b.toolbar
 
     private fun toggle(key: Long) {
         selected = if (key in selected) selected - key else selected + key
@@ -185,8 +188,8 @@ class MediaListActivity : BaseActivity() {
             }
             R.id.action_fix_date -> ops.fixDate(targets()) { afterOp() }
             // ---- aksi untuk item terpilih ----
-            R.id.action_share -> ops.share(selectedItems())
-            R.id.action_delete -> ops.delete(selectedItems()) { afterOp() }
+            R.id.action_share -> ops.share(selectedItems(), anchor(R.id.action_share))
+            R.id.action_delete -> ops.confirmDelete(anchor(R.id.action_delete), selectedItems()) { afterOp() }
             R.id.rot_left -> ops.rotate(selectedItems(), 270) { afterOp() }
             R.id.rot_right -> ops.rotate(selectedItems(), 90) { afterOp() }
             R.id.rot_180 -> ops.rotate(selectedItems(), 180) { afterOp() }
@@ -194,7 +197,7 @@ class MediaListActivity : BaseActivity() {
             R.id.action_copy -> ops.transfer(selectedItems(), false) { afterOp() }
             R.id.action_details -> ops.details(selectedItems())
             R.id.action_edit -> single()?.let { EditorActivity.start(this, it) }
-            R.id.action_set_as -> single()?.let { ops.setAs(it) }
+            R.id.action_set_as -> single()?.let { ops.setAs(it, b.toolbar) }
             R.id.action_show_map -> single()?.let { ops.locate(it) }
             R.id.action_rename -> single()?.let { m ->
                 inputDialog(R.string.rename, m.name.substringBeforeLast('.')) { n -> ops.rename(m, n) { afterOp() } }

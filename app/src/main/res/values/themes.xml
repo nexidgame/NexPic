@@ -6,17 +6,17 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:enforceNavigationBarContrast">false</item>
         <item name="android:enforceStatusBarContrast">false</item>
-        <item name="colorSurface">#FBFCFF</item>
-        <item name="android:colorBackground">#FBFCFF</item>
+        <item name="colorSurface">#F9FBFF</item>
+        <item name="android:colorBackground">#F9FBFF</item>
         <item name="colorOnSurface">#1A1C1E</item>
         <item name="colorSurfaceVariant">#E1E2EC</item>
         <item name="colorOnSurfaceVariant">#44474F</item>
         <item name="colorOutline">#74777F</item>
         <item name="colorSurfaceContainerLowest">#FFFFFF</item>
-        <item name="colorSurfaceContainerLow">#F3F4F9</item>
-        <item name="colorSurfaceContainer">#EDEEF3</item>
-        <item name="colorSurfaceContainerHigh">#E7E8EE</item>
-        <item name="colorSurfaceContainerHighest">#E1E2E8</item>
+        <item name="colorSurfaceContainerLow">#EFF4FF</item>
+        <item name="colorSurfaceContainer">#E7EEFF</item>
+        <item name="colorSurfaceContainerHigh">#DEE8FF</item>
+        <item name="colorSurfaceContainerHighest">#D5E1FB</item>
     </style>
 
     <style name="Theme.NexPic.Splash" parent="Theme.SplashScreen">

@@ -157,8 +157,19 @@ class ViewerActivity : BaseActivity() {
 
     private fun cur(): MediaItem? = items.getOrNull(b.pager.currentItem)
 
+    /** Video: tanpa pensil, Slideshow, Rotasi, Pilih sebagai, Perbaiki tanggal, dan Tampilkan di peta. */
+    private fun updateMenu(video: Boolean) {
+        listOf(
+            R.id.action_edit, R.id.action_slideshow, R.id.action_rotate,
+            R.id.action_set_as, R.id.action_fix_date, R.id.action_show_map
+        ).forEach { id -> b.toolbar.menu.findItem(id)?.isVisible = !video }
+    }
+
+    private fun anchor(id: Int): View = b.toolbar.findViewById<View>(id) ?: b.toolbar
+
     private fun updateInfo(pos: Int) {
         val it = items.getOrNull(pos) ?: return
+        updateMenu(it.isVideo)
         b.toolbar.title = it.name
         val res = if (it.width > 0) "${it.width}x${it.height}" else ""
         val date = if (it.dateTaken > 0) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(it.dateTaken)) else ""
@@ -217,7 +228,7 @@ class ViewerActivity : BaseActivity() {
         val it = cur() ?: return true
         when (id) {
             R.id.action_edit -> if (it.isVideo) toast(R.string.images_only) else EditorActivity.start(this, it)
-            R.id.action_delete -> ops.delete(listOf(it)) {
+            R.id.action_delete -> ops.confirmDelete(anchor(R.id.action_delete), listOf(it)) {
                 val p = b.pager.currentItem
                 items.removeAt(p)
                 if (items.isEmpty()) finish() else {
@@ -225,12 +236,12 @@ class ViewerActivity : BaseActivity() {
                     updateInfo(b.pager.currentItem)
                 }
             }
-            R.id.action_share -> ops.share(listOf(it))
+            R.id.action_share -> ops.share(listOf(it), anchor(R.id.action_share))
             R.id.action_slideshow -> startSlideshow()
             R.id.rot_left -> ops.rotate(listOf(it), 270) { reloadSoon() }
             R.id.rot_right -> ops.rotate(listOf(it), 90) { reloadSoon() }
             R.id.rot_180 -> ops.rotate(listOf(it), 180) { reloadSoon() }
-            R.id.action_set_as -> ops.setAs(it)
+            R.id.action_set_as -> ops.setAs(it, b.toolbar)
             R.id.action_move -> ops.transfer(listOf(it), true) { reloadSoon() }
             R.id.action_copy -> ops.transfer(listOf(it), false) { }
             R.id.action_fix_date -> ops.fixDate(listOf(it)) { reloadSoon() }

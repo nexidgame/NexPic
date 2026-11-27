@@ -1,6 +1,8 @@
 package com.nex.pic
 
+import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +14,14 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.MenuItemCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.forEach
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.google.android.material.color.DynamicColors
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nex.pic.databinding.DialogInputBinding
@@ -26,6 +32,7 @@ object Session { var unlockedAt = -1L }
 abstract class BaseActivity : AppCompatActivity() {
 
     private var themeVer = 0
+    protected var isNight = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         themeVer = ThemeState.version
@@ -58,13 +65,23 @@ abstract class BaseActivity : AppCompatActivity() {
             "light" -> false
             else -> (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
         }
+        isNight = night
         if (night && Prefs.amoled) theme.applyStyle(R.style.ThemeOverlay_NexPic_Amoled, true)
     }
 
     /** Bilah atas melayang di atas daftar; daftar diberi padding setinggi bilah + inset sistem/cutout. */
     protected fun setupBars(appBar: View, list: View) {
-        val surface = MaterialColors.getColor(appBar, com.google.android.material.R.attr.colorSurface)
-        appBar.setBackgroundColor(if (Prefs.translucent) ColorUtils.setAlphaComponent(surface, 0xCC) else surface)
+        // bilah atas berwarna biru (warna utama tema) dengan ikon & judul putih
+        val bar = MaterialColors.getColor(
+            appBar,
+            if (isNight) com.google.android.material.R.attr.colorPrimaryContainer else com.google.android.material.R.attr.colorPrimary
+        )
+        appBar.setBackgroundColor(if (Prefs.translucent) ColorUtils.setAlphaComponent(bar, 0xE6) else bar)
+        (appBar as? ViewGroup)?.let { g ->
+            val tb = (0 until g.childCount).map { g.getChildAt(it) }.filterIsInstance<MaterialToolbar>().firstOrNull()
+            // menu diisi setelah setupBars; tint dijalankan sesudah onCreate selesai
+            if (tb != null) g.post { tintBar(tb) }
+        }
         (list as? ViewGroup)?.clipToPadding = false
         var inset = Insets.NONE
         val apply = {
@@ -77,6 +94,16 @@ abstract class BaseActivity : AppCompatActivity() {
             w
         }
         appBar.addOnLayoutChangeListener { _, _, t, _, b, _, ot, _, ob -> if (b - t != ob - ot) apply() }
+    }
+
+    /** Judul, ikon navigasi, ikon menu, dan ikon titik tiga dibuat putih agar kontras di atas bilah biru. */
+    protected fun tintBar(t: MaterialToolbar) {
+        val white = ColorStateList.valueOf(Color.WHITE)
+        t.setTitleTextColor(Color.WHITE)
+        t.setNavigationIconTint(Color.WHITE)
+        t.menu.forEach { MenuItemCompat.setIconTintList(it, white) }
+        t.overflowIcon?.mutate()?.setTint(Color.WHITE)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
     }
 
     protected fun toast(@StringRes r: Int) = Toast.makeText(this, r, Toast.LENGTH_SHORT).show()

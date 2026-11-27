@@ -147,4 +147,19 @@
     <string name="zoom_buttons_sum">Tombol perbesar dan perkecil</string>
     <string name="clear_on_exit">Bersihkan cache saat keluar</string>
     <string name="storage_root">Penyimpanan internal</string>
+    <!-- Revisi: hapus, berbagi, pindah, wallpaper -->
+    <string name="delete_n">Hapus (%d)</string>
+    <string name="move_to_colon">Pindahkan ke:</string>
+    <string name="copy_to_colon">Salin ke:</string>
+    <string name="wallpaper">Wallpaper</string>
+    <string name="set_as_other">Lainnya…</string>
+    <string name="wp_set">Atur wallpaper</string>
+    <string name="wp_home">Layar utama</string>
+    <string name="wp_lock">Layar kunci</string>
+    <string name="wp_both">Layar utama dan layar kunci</string>
+    <string name="wp_done">Wallpaper diterapkan</string>
+    <string name="allfiles_title">Izin kelola semua berkas</string>
+    <string name="allfiles_msg">Agar foto dan video bisa dihapus atau dipindah tanpa dialog izin sistem di setiap aksi, aktifkan \"Izinkan akses ke semua berkas\" untuk Nex Pic.</string>
+    <string name="open_settings">Buka pengaturan</string>
+    <string name="skip">Lewati</string>
 </resources>

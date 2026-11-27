@@ -6,10 +6,15 @@ import android.content.ClipData
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.graphics.Matrix
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.Settings
+import android.view.View
 import android.provider.MediaStore
 import android.text.format.Formatter
 import android.widget.Toast
@@ -44,6 +49,14 @@ class MediaOps(private val act: ComponentActivity) {
         if (r.resultCode == Activity.RESULT_OK) p?.invoke()
     }
 
+    private var pickCb: ((String) -> Unit)? = null
+    private val pickLauncher = act.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { r ->
+        val cb = pickCb
+        pickCb = null
+        val p = r.data?.getStringExtra(FolderPickerActivity.EXTRA_PATH)
+        if (r.resultCode == Activity.RESULT_OK && p != null) cb?.invoke(p)
+    }
+
     private val permLauncher = act.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         val p = permCallback
         permCallback = null
@@ -56,8 +69,43 @@ class MediaOps(private val act: ComponentActivity) {
         Toast.makeText(act, act.getString(R.string.op_result, ok, fail), Toast.LENGTH_LONG).show()
 
     // ---------- izin tulis / hapus ----------
+    /** Dengan izin "akses semua berkas", Android tidak lagi menampilkan dialog sistem untuk menghapus / mengubah. */
+    private fun hasAllFiles() = Build.VERSION.SDK_INT >= 30 && Environment.isExternalStorageManager()
+
+    private fun openAllFilesSettings() {
+        try {
+            act.startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:${act.packageName}")))
+        } catch (e: Exception) {
+            try {
+                act.startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+            } catch (e2: Exception) {
+                toast(R.string.no_app)
+            }
+        }
+    }
+
+    /** Ditawarkan satu kali. Dilewati / ditolak: aksi tetap jalan lewat dialog izin bawaan sistem. */
+    private fun ensureAllFiles(next: () -> Unit) {
+        if (hasAllFiles() || Prefs.sp.getBoolean("asked_all_files", false)) {
+            next()
+            return
+        }
+        Prefs.sp.edit().putBoolean("asked_all_files", true).apply()
+        MaterialAlertDialogBuilder(act)
+            .setTitle(R.string.allfiles_title)
+            .setMessage(R.string.allfiles_msg)
+            .setCancelable(false)
+            .setPositiveButton(R.string.open_settings) { _, _ -> openAllFilesSettings() }
+            .setNegativeButton(R.string.skip) { _, _ -> next() }
+            .show()
+    }
+
     fun withWrite(items: List<MediaItem>, block: () -> Unit) {
         if (items.isEmpty()) return
+        if (hasAllFiles()) {
+            block()
+            return
+        }
         try {
             val pi = MediaStore.createWriteRequest(cr, items.map { it.uri })
             pending = block
@@ -67,8 +115,45 @@ class MediaOps(private val act: ComponentActivity) {
         }
     }
 
+    /** Konfirmasi hapus: popup kecil berikon tong sampah merah, bukan dialog "Izinkan ... menghapus". */
+    fun confirmDelete(anchor: View?, items: List<MediaItem>, done: () -> Unit) {
+        if (items.isEmpty()) return
+        val red = 0xFFEF4444.toInt()
+        val label = if (items.size > 1) act.getString(R.string.delete_n, items.size) else act.getString(R.string.delete)
+        PopupPanel.show(
+            act, anchor,
+            listOf(PopupPanel.Row(PopupPanel.tinted(act, R.drawable.ic_delete, red), label, red) {
+                ensureAllFiles { delete(items, done) }
+            }),
+            dark = act is ViewerActivity
+        )
+    }
+
     fun delete(items: List<MediaItem>, done: () -> Unit) {
         if (items.isEmpty()) return
+        if (!hasAllFiles()) {
+            systemDelete(items, done)
+            return
+        }
+        bg.execute {
+            var ok = 0
+            items.forEach {
+                try {
+                    if (cr.delete(it.uri, null, null) > 0) ok++
+                } catch (e: Exception) {
+                }
+            }
+            ui {
+                if (ok == 0) systemDelete(items, done)
+                else {
+                    if (ok < items.size) result(ok, items.size - ok)
+                    done()
+                }
+            }
+        }
+    }
+
+    private fun systemDelete(items: List<MediaItem>, done: () -> Unit) {
         try {
             val pi = MediaStore.createDeleteRequest(cr, items.map { it.uri })
             pending = done
@@ -192,38 +277,11 @@ class MediaOps(private val act: ComponentActivity) {
         }
     }
 
-    /** Dialog pilih folder tujuan (+ "Folder baru"). */
+    /** Layar pilih folder tujuan ("Pindahkan ke:" / "Salin ke:") berupa grid folder. */
     fun transfer(items: List<MediaItem>, isMove: Boolean, done: () -> Unit) {
         if (items.isEmpty()) return
-        bg.execute {
-            val folders = MediaRepo.folders(act, MediaRepo.load(act))
-            ui {
-                val labels = folders.map { "${it.name}\n${it.path}" } + act.getString(R.string.new_folder)
-                MaterialAlertDialogBuilder(act)
-                    .setTitle(if (isMove) R.string.move_to else R.string.copy_to)
-                    .setItems(labels.toTypedArray()) { _, i ->
-                        val go = { rel: String -> if (isMove) move(items, rel, done) else copy(items, rel, done) }
-                        if (i < folders.size) go(folders[i].path)
-                        else promptNewFolder { name -> go("Pictures/$name/") }
-                    }
-                    .setNegativeButton(R.string.cancel, null)
-                    .show()
-            }
-        }
-    }
-
-    private fun promptNewFolder(onName: (String) -> Unit) {
-        val v = DialogInputBinding.inflate(act.layoutInflater)
-        v.input.hint = act.getString(R.string.folder_name)
-        MaterialAlertDialogBuilder(act)
-            .setTitle(R.string.new_folder)
-            .setView(v.root)
-            .setPositiveButton(R.string.ok) { _, _ ->
-                val n = v.input.text.toString().trim().replace(Regex("[\\\\/:*?\"<>|]"), "_")
-                if (n.isNotEmpty()) onName(n)
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+        pickCb = { rel -> if (isMove) move(items, rel, done) else copy(items, rel, done) }
+        pickLauncher.launch(FolderPickerActivity.intent(act, if (isMove) R.string.move_to_colon else R.string.copy_to_colon))
     }
 
     /** Ganti nama folder = pindahkan semua berkas ke path baru. */
@@ -327,8 +385,18 @@ class MediaOps(private val act: ComponentActivity) {
     }
 
     // ---------- lain-lain ----------
-    fun share(items: List<MediaItem>) {
-        if (items.isEmpty()) return
+    private class ShareTarget(val label: String, val pkgs: List<String>, val hints: List<String>, val requireHint: Boolean = false)
+
+    /** Berbagi hanya ke aplikasi ini (yang terpasang). */
+    private val shareTargets = listOf(
+        ShareTarget("Quick Share", listOf("com.google.android.gms", "com.samsung.android.app.sharelive"), listOf("nearby.sharing", "sharelive"), true),
+        ShareTarget("WhatsApp", listOf("com.whatsapp"), listOf("ContactPicker")),
+        ShareTarget("WhatsApp Business", listOf("com.whatsapp.w4b"), listOf("ContactPicker")),
+        ShareTarget("Instagram", listOf("com.instagram.android"), listOf("ShareHandlerActivity")),
+        ShareTarget("Facebook", listOf("com.facebook.katana"), listOf("ImplicitShareIntentHandler"))
+    )
+
+    private fun shareIntent(items: List<MediaItem>): Intent {
         val i: Intent
         if (items.size == 1) {
             i = Intent(Intent.ACTION_SEND).apply {
@@ -343,14 +411,53 @@ class MediaOps(private val act: ComponentActivity) {
         }
         i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         i.clipData = ClipData.newRawUri(null, items[0].uri).also { cd -> items.drop(1).forEach { cd.addItem(ClipData.Item(it.uri)) } }
-        try {
-            act.startActivity(Intent.createChooser(i, null))
-        } catch (e: Exception) {
-            toast(R.string.no_app)
-        }
+        return i
     }
 
-    fun setAs(item: MediaItem) {
+    private fun pickTarget(found: List<ResolveInfo>, t: ShareTarget): ResolveInfo? {
+        val c = found.filter { it.activityInfo.packageName in t.pkgs }
+        val hinted = c.firstOrNull { r -> t.hints.any { r.activityInfo.name.contains(it, ignoreCase = true) } }
+        return hinted ?: if (t.requireHint) null else c.firstOrNull()
+    }
+
+    fun share(items: List<MediaItem>, anchor: View? = null) {
+        if (items.isEmpty()) return
+        val base = shareIntent(items)
+        val pm = act.packageManager
+        val found: List<ResolveInfo> = try { pm.queryIntentActivities(base, 0) } catch (e: Exception) { emptyList() }
+        val rows = ArrayList<PopupPanel.Row>()
+        shareTargets.forEach { t ->
+            val ri = pickTarget(found, t) ?: return@forEach
+            rows.add(PopupPanel.Row(ri.loadIcon(pm), t.label) {
+                try {
+                    act.startActivity(Intent(base).setClassName(ri.activityInfo.packageName, ri.activityInfo.name))
+                } catch (e: Exception) {
+                    toast(R.string.no_app)
+                }
+            })
+        }
+        if (rows.isEmpty()) toast(R.string.no_app)
+        else PopupPanel.show(act, anchor, rows, dark = act is ViewerActivity)
+    }
+
+    /** Pilih sebagai: Wallpaper (layar potong di dalam aplikasi) atau aplikasi lain. */
+    fun setAs(item: MediaItem, anchor: View? = null) {
+        if (item.isVideo) return
+        val fg = if (act is ViewerActivity) android.graphics.Color.WHITE
+        else com.google.android.material.color.MaterialColors.getColor(act, com.google.android.material.R.attr.colorOnSurface, android.graphics.Color.BLACK)
+        PopupPanel.show(
+            act, anchor,
+            listOf(
+                PopupPanel.Row(PopupPanel.tinted(act, R.drawable.ic_photo_library, fg), act.getString(R.string.wallpaper)) {
+                    WallpaperActivity.start(act, item)
+                },
+                PopupPanel.Row(PopupPanel.tinted(act, R.drawable.ic_info, fg), act.getString(R.string.set_as_other)) { setAsOther(item) }
+            ),
+            dark = act is ViewerActivity, topEnd = true
+        )
+    }
+
+    private fun setAsOther(item: MediaItem) {
         try {
             act.startActivity(
                 Intent.createChooser(
