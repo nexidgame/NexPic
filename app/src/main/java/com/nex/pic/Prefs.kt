@@ -13,7 +13,7 @@ object Prefs {
 
     val themeMode: String get() = sp.getString("theme_mode", "system") ?: "system"
     val amoled: Boolean get() = sp.getBoolean("amoled", false)
-    val dynamic: Boolean get() = sp.getBoolean("dynamic_color", false)
+    val dynamic: Boolean get() = sp.getBoolean("dynamic_color", true)
     val palette: String get() = sp.getString("palette", "blue") ?: "blue"
     val translucent: Boolean get() = sp.getBoolean("translucent", false)
     val lock: Boolean get() = sp.getBoolean("lock_app", false)

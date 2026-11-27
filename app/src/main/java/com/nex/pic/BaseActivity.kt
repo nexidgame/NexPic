@@ -32,7 +32,6 @@ object Session { var unlockedAt = -1L }
 abstract class BaseActivity : AppCompatActivity() {
 
     private var themeVer = 0
-    protected var isNight = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         themeVer = ThemeState.version
@@ -47,6 +46,11 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private fun applyNexTheme() {
+        if (Prefs.themeMode == "blue") {
+            theme.applyStyle(R.style.ThemeOverlay_NexPic_Blue, true)
+            theme.applyStyle(R.style.ThemeOverlay_NexPic_BlueMode, true)
+            return
+        }
         if (Prefs.dynamic && DynamicColors.isDynamicColorAvailable()) {
             DynamicColors.applyToActivityIfAvailable(this)
         } else {
@@ -65,21 +69,19 @@ abstract class BaseActivity : AppCompatActivity() {
             "light" -> false
             else -> (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
         }
-        isNight = night
         if (night && Prefs.amoled) theme.applyStyle(R.style.ThemeOverlay_NexPic_Amoled, true)
     }
 
     /** Bilah atas melayang di atas daftar; daftar diberi padding setinggi bilah + inset sistem/cutout. */
     protected fun setupBars(appBar: View, list: View) {
-        // bilah atas berwarna biru (warna utama tema) dengan ikon & judul putih
-        val bar = MaterialColors.getColor(
+        val blue = Prefs.themeMode == "blue"
+        val surface = MaterialColors.getColor(
             appBar,
-            if (isNight) com.google.android.material.R.attr.colorPrimaryContainer else com.google.android.material.R.attr.colorPrimary
+            if (blue) com.google.android.material.R.attr.colorPrimary else com.google.android.material.R.attr.colorSurface
         )
-        appBar.setBackgroundColor(if (Prefs.translucent) ColorUtils.setAlphaComponent(bar, 0xE6) else bar)
-        (appBar as? ViewGroup)?.let { g ->
+        appBar.setBackgroundColor(if (Prefs.translucent) ColorUtils.setAlphaComponent(surface, 0xCC) else surface)
+        if (blue) (appBar as? ViewGroup)?.let { g ->
             val tb = (0 until g.childCount).map { g.getChildAt(it) }.filterIsInstance<MaterialToolbar>().firstOrNull()
-            // menu diisi setelah setupBars; tint dijalankan sesudah onCreate selesai
             if (tb != null) g.post { tintBar(tb) }
         }
         (list as? ViewGroup)?.clipToPadding = false
@@ -96,8 +98,9 @@ abstract class BaseActivity : AppCompatActivity() {
         appBar.addOnLayoutChangeListener { _, _, t, _, b, _, ot, _, ob -> if (b - t != ob - ot) apply() }
     }
 
-    /** Judul, ikon navigasi, ikon menu, dan ikon titik tiga dibuat putih agar kontras di atas bilah biru. */
+    /** Hanya tema Biru: judul & ikon bilah atas putih di atas latar biru. */
     protected fun tintBar(t: MaterialToolbar) {
+        if (Prefs.themeMode != "blue") return
         val white = ColorStateList.valueOf(Color.WHITE)
         t.setTitleTextColor(Color.WHITE)
         t.setNavigationIconTint(Color.WHITE)

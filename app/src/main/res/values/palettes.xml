@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="ThemeOverlay.NexPic.Blue" parent="">
-        <item name="colorPrimary">#1D63ED</item>
+        <item name="colorPrimary">#0B57D0</item>
         <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorPrimaryContainer">#B6CEFF</item>
-        <item name="colorOnPrimaryContainer">#001A4D</item>
-        <item name="colorSecondaryContainer">#C3D6FF</item>
-        <item name="colorOnSecondaryContainer">#0A1F52</item>
-        <item name="colorSecondary">#1D63ED</item>
+        <item name="colorPrimaryContainer">#D3E3FD</item>
+        <item name="colorOnPrimaryContainer">#041E49</item>
+        <item name="colorSecondaryContainer">#DDE3F0</item>
+        <item name="colorOnSecondaryContainer">#151C2B</item>
+        <item name="colorSecondary">#0B57D0</item>
     </style>
     <style name="ThemeOverlay.NexPic.Teal" parent="">
         <item name="colorPrimary">#006B5E</item>

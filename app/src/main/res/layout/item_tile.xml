@@ -57,7 +57,7 @@
         android:id="@+id/selOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#661D63ED"
+        android:background="#552F6FED"
         android:visibility="gone" />
 
     <ImageView

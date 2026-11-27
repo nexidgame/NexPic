@@ -6,13 +6,30 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:enforceNavigationBarContrast">false</item>
         <item name="android:enforceStatusBarContrast">false</item>
-        <item name="colorSurface">#F9FBFF</item>
-        <item name="android:colorBackground">#F9FBFF</item>
+        <item name="colorSurface">#FBFCFF</item>
+        <item name="android:colorBackground">#FBFCFF</item>
         <item name="colorOnSurface">#1A1C1E</item>
         <item name="colorSurfaceVariant">#E1E2EC</item>
         <item name="colorOnSurfaceVariant">#44474F</item>
         <item name="colorOutline">#74777F</item>
         <item name="colorSurfaceContainerLowest">#FFFFFF</item>
+        <item name="colorSurfaceContainerLow">#F3F4F9</item>
+        <item name="colorSurfaceContainer">#EDEEF3</item>
+        <item name="colorSurfaceContainerHigh">#E7E8EE</item>
+        <item name="colorSurfaceContainerHighest">#E1E2E8</item>
+    </style>
+
+    <!-- Tema "Biru": biru modern pekat, bilah atas biru. Dipilih di Pengaturan > Tema. -->
+    <style name="ThemeOverlay.NexPic.BlueMode" parent="">
+        <item name="colorPrimary">#1D63ED</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#B6CEFF</item>
+        <item name="colorOnPrimaryContainer">#001A4D</item>
+        <item name="colorSecondary">#1D63ED</item>
+        <item name="colorSecondaryContainer">#C3D6FF</item>
+        <item name="colorOnSecondaryContainer">#0A1F52</item>
+        <item name="colorSurface">#F9FBFF</item>
+        <item name="android:colorBackground">#F9FBFF</item>
         <item name="colorSurfaceContainerLow">#EFF4FF</item>
         <item name="colorSurfaceContainer">#E7EEFF</item>
         <item name="colorSurfaceContainerHigh">#DEE8FF</item>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="theme_entries"><item>Ikuti sistem</item><item>Terang</item><item>Gelap</item></string-array>
-    <string-array name="theme_values"><item>system</item><item>light</item><item>dark</item></string-array>
+    <string-array name="theme_entries"><item>Ikuti sistem</item><item>Terang</item><item>Gelap</item><item>Biru</item></string-array>
+    <string-array name="theme_values"><item>system</item><item>light</item><item>dark</item><item>blue</item></string-array>
     <string-array name="palette_entries"><item>Biru</item><item>Hijau tosca</item><item>Ungu</item><item>Mawar</item><item>Jingga</item></string-array>
     <string-array name="palette_values"><item>blue</item><item>teal</item><item>purple</item><item>rose</item><item>orange</item></string-array>
     <string-array name="thumb_entries"><item>Kecil</item><item>Sedang</item><item>Besar</item></string-array>
