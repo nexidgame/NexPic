@@ -84,13 +84,12 @@ class MediaOps(private val act: ComponentActivity) {
         }
     }
 
-    /** Ditawarkan satu kali. Dilewati / ditolak: aksi tetap jalan lewat dialog izin bawaan sistem. */
+    /** Ditawarkan selama izin belum aktif. Dilewati: aksi tetap jalan lewat dialog izin bawaan sistem. */
     private fun ensureAllFiles(next: () -> Unit) {
-        if (hasAllFiles() || Prefs.sp.getBoolean("asked_all_files", false)) {
+        if (hasAllFiles()) {
             next()
             return
         }
-        Prefs.sp.edit().putBoolean("asked_all_files", true).apply()
         MaterialAlertDialogBuilder(act)
             .setTitle(R.string.allfiles_title)
             .setMessage(R.string.allfiles_msg)
@@ -106,6 +105,10 @@ class MediaOps(private val act: ComponentActivity) {
             block()
             return
         }
+        ensureAllFiles { systemWrite(items, block) }
+    }
+
+    private fun systemWrite(items: List<MediaItem>, block: () -> Unit) {
         try {
             val pi = MediaStore.createWriteRequest(cr, items.map { it.uri })
             pending = block
