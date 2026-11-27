@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_delete" android:icon="@drawable/ic_delete" android:title="@string/delete" app:showAsAction="always" />
+    <item android:id="@+id/action_share" android:icon="@drawable/ic_share" android:title="@string/share" app:showAsAction="always" />
+    <item android:id="@+id/action_rotate" android:icon="@drawable/ic_rotate" android:title="@string/rotate" app:showAsAction="always">
+        <menu>
+            <item android:id="@+id/rot_left" android:title="@string/rot_left" />
+            <item android:id="@+id/rot_right" android:title="@string/rot_right" />
+            <item android:id="@+id/rot_180" android:title="@string/rot_180" />
+        </menu>
+    </item>
+    <item android:id="@+id/action_edit" android:title="@string/edit_title" app:showAsAction="never" />
+    <item android:id="@+id/action_set_as" android:title="@string/set_as" app:showAsAction="never" />
+    <item android:id="@+id/action_move" android:title="@string/move_to" app:showAsAction="never" />
+    <item android:id="@+id/action_copy" android:title="@string/copy_to" app:showAsAction="never" />
+    <item android:id="@+id/action_rename" android:title="@string/rename" app:showAsAction="never" />
+    <item android:id="@+id/action_show_map" android:title="@string/show_map" app:showAsAction="never" />
+    <item android:id="@+id/action_fix_date" android:title="@string/fix_date" app:showAsAction="never" />
+    <item android:id="@+id/action_details" android:title="@string/details" app:showAsAction="never" />
+    <item android:id="@+id/action_select_all" android:title="@string/select_all" app:showAsAction="never" />
+</menu>

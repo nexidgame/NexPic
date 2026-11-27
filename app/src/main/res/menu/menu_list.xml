@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_sort" android:icon="@drawable/ic_sort" android:title="@string/sort" app:showAsAction="always" />
+    <item android:id="@+id/action_slideshow" android:icon="@drawable/ic_play_circle" android:title="@string/slideshow" app:showAsAction="always" />
+    <item android:id="@+id/action_view_mode" android:title="@string/view_mode" app:showAsAction="never" />
+    <item android:id="@+id/action_hide" android:title="@string/hide" app:showAsAction="never" />
+    <item android:id="@+id/action_exclude" android:title="@string/exclude" app:showAsAction="never" />
+    <item android:id="@+id/action_rename_folder" android:title="@string/rename" app:showAsAction="never" />
+    <item android:id="@+id/action_fix_date" android:title="@string/fix_date" app:showAsAction="never" />
+    <item android:id="@+id/action_select_all" android:title="@string/select_all" app:showAsAction="never" />
+</menu>

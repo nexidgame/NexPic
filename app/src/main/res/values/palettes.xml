@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ThemeOverlay.NexPic.Blue" parent="">
+        <item name="colorPrimary">#0B57D0</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#D3E3FD</item>
+        <item name="colorOnPrimaryContainer">#041E49</item>
+        <item name="colorSecondaryContainer">#DDE3F0</item>
+        <item name="colorOnSecondaryContainer">#151C2B</item>
+        <item name="colorSecondary">#0B57D0</item>
+    </style>
+    <style name="ThemeOverlay.NexPic.Teal" parent="">
+        <item name="colorPrimary">#006B5E</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#9FF2E0</item>
+        <item name="colorOnPrimaryContainer">#00201B</item>
+        <item name="colorSecondaryContainer">#CCE8E2</item>
+        <item name="colorOnSecondaryContainer">#05201C</item>
+        <item name="colorSecondary">#006B5E</item>
+    </style>
+    <style name="ThemeOverlay.NexPic.Purple" parent="">
+        <item name="colorPrimary">#6750A4</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#EADDFF</item>
+        <item name="colorOnPrimaryContainer">#21005D</item>
+        <item name="colorSecondaryContainer">#E8DEF8</item>
+        <item name="colorOnSecondaryContainer">#1D192B</item>
+        <item name="colorSecondary">#6750A4</item>
+    </style>
+    <style name="ThemeOverlay.NexPic.Rose" parent="">
+        <item name="colorPrimary">#984061</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#FFD9E2</item>
+        <item name="colorOnPrimaryContainer">#3E001D</item>
+        <item name="colorSecondaryContainer">#F5DDE2</item>
+        <item name="colorOnSecondaryContainer">#2B151A</item>
+        <item name="colorSecondary">#984061</item>
+    </style>
+    <style name="ThemeOverlay.NexPic.Orange" parent="">
+        <item name="colorPrimary">#8B5000</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#FFDCBE</item>
+        <item name="colorOnPrimaryContainer">#2C1600</item>
+        <item name="colorSecondaryContainer">#FADEC3</item>
+        <item name="colorOnSecondaryContainer">#2A1700</item>
+        <item name="colorSecondary">#8B5000</item>
+    </style>
+</resources>

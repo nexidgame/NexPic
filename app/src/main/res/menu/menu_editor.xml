@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_save" android:icon="@drawable/ic_check" android:title="@string/save" app:showAsAction="always" />
+    <item android:id="@+id/action_rotate" android:icon="@drawable/ic_rotate" android:title="@string/rotate" app:showAsAction="always">
+        <menu>
+            <item android:id="@+id/rot_left" android:title="@string/rot_left" />
+            <item android:id="@+id/rot_right" android:title="@string/rot_right" />
+            <item android:id="@+id/rot_180" android:title="@string/rot_180" />
+        </menu>
+    </item>
+    <item android:id="@+id/action_flip" android:icon="@drawable/ic_flip" android:title="@string/flip" app:showAsAction="always">
+        <menu>
+            <item android:id="@+id/flip_h" android:title="@string/flip_h" />
+            <item android:id="@+id/flip_v" android:title="@string/flip_v" />
+        </menu>
+    </item>
+    <item android:id="@+id/action_resize" android:title="@string/resize" app:showAsAction="never" />
+    <item android:id="@+id/action_crop" android:title="@string/crop" app:showAsAction="never" />
+</menu>

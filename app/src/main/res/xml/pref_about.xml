@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <Preference android:key="about_app" android:title="@string/app_name" android:summary="@string/about_desc" android:selectable="false" app:iconSpaceReserved="false" />
+    <Preference android:key="about_version" android:title="@string/set_about" android:selectable="false" app:iconSpaceReserved="false" />
+    <Preference android:key="about_pkg" android:title="Package" android:summary="com.nex.pic" android:selectable="false" app:iconSpaceReserved="false" />
+</PreferenceScreen>

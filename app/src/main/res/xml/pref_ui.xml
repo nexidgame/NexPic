@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/cat_appearance" app:iconSpaceReserved="false">
+        <ListPreference android:key="theme_mode" android:title="@string/theme" android:entries="@array/theme_entries" android:entryValues="@array/theme_values" android:defaultValue="system" app:iconSpaceReserved="false" app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat android:key="amoled" android:title="@string/amoled" android:summary="@string/amoled_sum" android:defaultValue="false" app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat android:key="dynamic_color" android:title="@string/dynamic" android:summary="@string/dynamic_sum" android:defaultValue="true" app:iconSpaceReserved="false" />
+        <ListPreference android:key="palette" android:title="@string/palette" android:entries="@array/palette_entries" android:entryValues="@array/palette_values" android:defaultValue="blue" app:iconSpaceReserved="false" app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat android:key="translucent" android:title="@string/translucent" android:summary="@string/translucent_sum" android:defaultValue="false" app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+</PreferenceScreen>

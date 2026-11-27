@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/cat_anim" app:iconSpaceReserved="false">
+        <SwitchPreferenceCompat android:key="slide_fade" android:title="@string/slide_fade" android:summary="@string/slide_fade_sum" android:defaultValue="true" app:iconSpaceReserved="false" />
+        <ListPreference android:key="slide_interval" android:title="@string/slide_interval" android:entries="@array/interval_entries" android:entryValues="@array/interval_values" android:defaultValue="3" app:iconSpaceReserved="false" app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat android:key="slide_random" android:title="@string/slide_random" android:defaultValue="false" app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+</PreferenceScreen>

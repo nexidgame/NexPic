@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/cat_folder" app:iconSpaceReserved="false">
+        <SwitchPreferenceCompat android:key="include_videos" android:title="@string/include_videos" android:summary="@string/include_videos_sum" android:defaultValue="true" app:iconSpaceReserved="false" />
+        <Preference android:key="excluded" android:title="@string/excluded_title" android:summary="@string/excluded_sum" app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/cat_sort" app:iconSpaceReserved="false">
+        <SwitchPreferenceCompat android:key="numeric_sort" android:title="@string/numeric_sort" android:summary="@string/numeric_sort_sum" android:defaultValue="true" app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/cat_nav" app:iconSpaceReserved="false">
+        <SwitchPreferenceCompat android:key="nav_horizontal" android:title="@string/nav_horizontal" android:summary="@string/nav_horizontal_sum" android:defaultValue="true" app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat android:key="square_thumbs" android:title="@string/square_thumbs" android:defaultValue="true" app:iconSpaceReserved="false" />
+        <ListPreference android:key="thumb_size" android:title="@string/thumb_size" android:entries="@array/thumb_entries" android:entryValues="@array/thumb_values" android:defaultValue="medium" app:iconSpaceReserved="false" app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+</PreferenceScreen>

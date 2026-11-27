@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreferenceCompat android:key="clear_on_exit" android:title="@string/clear_on_exit" android:defaultValue="false" app:iconSpaceReserved="false" />
+    <Preference android:key="clear_cache" android:title="@string/clear_cache" android:summary="@string/clear_cache_sum" app:iconSpaceReserved="false" />
+</PreferenceScreen>

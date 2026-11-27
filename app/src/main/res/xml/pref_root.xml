@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <Preference android:key="go_ui" android:title="@string/set_ui" android:summary="@string/set_ui_sum" app:icon="@drawable/ic_palette" />
+    <Preference android:key="go_album" android:title="@string/set_album" android:summary="@string/set_album_sum" app:icon="@drawable/ic_folder" />
+    <Preference android:key="go_view" android:title="@string/set_view" android:summary="@string/set_view_sum" app:icon="@drawable/ic_grid_view" />
+    <Preference android:key="go_security" android:title="@string/set_security" android:summary="@string/set_security_sum" app:icon="@drawable/ic_lock" />
+    <Preference android:key="go_slideshow" android:title="@string/set_slideshow" android:summary="@string/set_slideshow_sum" app:icon="@drawable/ic_play_circle" />
+    <Preference android:key="go_cache" android:title="@string/set_cache" android:summary="@string/set_cache_sum" app:icon="@drawable/ic_cleaning" />
+    <Preference android:key="go_about" android:title="@string/set_about" android:summary="@string/set_about_sum" app:icon="@drawable/ic_info" />
+</PreferenceScreen>

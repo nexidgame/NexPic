@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/cat_viewer" app:iconSpaceReserved="false">
+        <SwitchPreferenceCompat android:key="last_album" android:title="@string/last_album" android:summary="@string/last_album_sum" android:defaultValue="false" app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat android:key="tap_swap" android:title="@string/tap_swap" android:summary="@string/tap_swap_sum" android:defaultValue="false" app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat android:key="zoom_buttons" android:title="@string/zoom_buttons" android:summary="@string/zoom_buttons_sum" android:defaultValue="true" app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat android:key="info_bar" android:title="@string/info_bar" android:summary="@string/info_bar_sum" android:defaultValue="true" app:iconSpaceReserved="false" />
+        <ListPreference android:key="double_tap_zoom" android:title="@string/double_tap" android:entries="@array/zoom_entries" android:entryValues="@array/zoom_values" android:defaultValue="2.5" app:iconSpaceReserved="false" app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+</PreferenceScreen>
