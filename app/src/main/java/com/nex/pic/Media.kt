@@ -181,9 +181,6 @@ object MediaRepo {
                 val cover = v.maxByOrNull { it.dateModified } ?: v.first()
                 Album(id, albumLabel(ctx, v.first()), v.size, cover, cover.dateModified, v.first().path)
             }
-        // dua folder berbeda dengan nama sama: tambahkan lokasi agar tidak membingungkan
-        val dup = list.groupBy { it.name.lowercase() }.filter { it.value.size > 1 }.keys
-        list = list.map { if (it.name.lowercase() in dup) it.copy(name = "${it.name} (${it.path.trimEnd('/')})") else it }
         if (query.isNotBlank()) list = list.filter { it.name.contains(query, ignoreCase = true) }
         val parts = sortKey.split("_")
         val desc = parts.getOrElse(1) { "asc" } == "desc"
@@ -192,7 +189,9 @@ object MediaRepo {
             "count" -> Comparator { a, b -> a.count.compareTo(b.count) }
             else -> Comparator { a, b -> natural(a.name, b.name) }
         }
-        return list.sortedWith(if (desc) cmp.reversed() else cmp)
+        val sorted = list.sortedWith(if (desc) cmp.reversed() else cmp)
+        val pinned = Prefs.pinnedIds
+        return if (pinned.isEmpty()) sorted else sorted.filter { it.id in pinned } + sorted.filter { it.id !in pinned }
     }
 
     /** Daftar folder tujuan untuk Salin ke / Pindahkan ke. */

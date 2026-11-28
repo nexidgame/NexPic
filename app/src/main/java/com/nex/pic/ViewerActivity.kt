@@ -163,6 +163,11 @@ class ViewerActivity : BaseActivity() {
             R.id.action_edit, R.id.action_slideshow, R.id.action_rotate,
             R.id.action_set_as, R.id.action_fix_date, R.id.action_show_map
         ).forEach { id -> b.toolbar.menu.findItem(id)?.isVisible = !video }
+        // ikon putar layar (landscape <-> potret) hanya untuk video, di posisi ikon pensil
+        b.toolbar.menu.findItem(R.id.action_orient)?.isVisible = video
+        if (!video && requestedOrientation != android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
+            requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
     }
 
     private fun anchor(id: Int): View = b.toolbar.findViewById<View>(id) ?: b.toolbar
@@ -237,6 +242,11 @@ class ViewerActivity : BaseActivity() {
                 }
             }
             R.id.action_share -> ops.share(listOf(it), anchor(R.id.action_share))
+            R.id.action_orient -> {
+                val land = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+                requestedOrientation = if (land) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
             R.id.action_slideshow -> startSlideshow()
             R.id.rot_left -> ops.rotate(listOf(it), 270) { reloadSoon() }
             R.id.rot_right -> ops.rotate(listOf(it), 90) { reloadSoon() }

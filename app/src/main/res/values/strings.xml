@@ -162,4 +162,7 @@
     <string name="allfiles_msg">Agar foto dan video bisa dihapus atau dipindah tanpa dialog izin sistem di setiap aksi, aktifkan \"Izinkan akses ke semua berkas\" untuk Nex Pic.</string>
     <string name="open_settings">Buka pengaturan</string>
     <string name="skip">Lewati</string>
+    <string name="pin_top">Di atas</string>
+    <string name="unpin_top">Lepas dari atas</string>
+    <string name="orient">Putar layar</string>
 </resources>

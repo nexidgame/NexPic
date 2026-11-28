@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nex.pic.databinding.ActivityMainBinding
 import java.util.concurrent.Executors
 import kotlin.math.max
@@ -30,6 +31,9 @@ class MainActivity : BaseActivity() {
     private var mode = 0 // 0 = album, 1 = momen
     private var query = ""
     private var asked = false
+    private val ops = MediaOps(this)
+    private var selected: Set<Long> = emptySet()
+    private var albumList: List<Album> = emptyList()
 
     private val permLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { refresh() }
     private val authLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { r ->
@@ -47,15 +51,14 @@ class MainActivity : BaseActivity() {
         setContentView(b.root)
         setupBars(b.appBar, b.list)
 
-        adapter = TileAdapter({ _, t -> open(t) })
+        adapter = TileAdapter({ _, t -> if (mode == 0 && selected.isNotEmpty()) toggle(t.key) else open(t) }, { _, t -> if (mode == 0) toggle(t.key) })
         b.list.adapter = adapter
         b.list.layoutManager = GridLayoutManager(this, 2)
         setupGrid()
 
-        b.toolbar.setNavigationOnClickListener { b.drawer.open() }
-        b.toolbar.inflateMenu(R.menu.menu_main)
+        b.toolbar.setNavigationOnClickListener { if (selected.isNotEmpty()) clearSel() else b.drawer.open() }
         b.toolbar.setOnMenuItemClickListener { onMenu(it.itemId) }
-        b.toolbar.menu.findItem(R.id.action_show_hidden)?.isChecked = Prefs.showHidden
+        renderToolbar()
         b.nav.setCheckedItem(R.id.nav_albums)
         b.nav.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -82,6 +85,7 @@ class MainActivity : BaseActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 when {
+                    selected.isNotEmpty() -> clearSel()
                     b.drawer.isDrawerOpen(GravityCompat.START) -> b.drawer.closeDrawers()
                     mode == 1 -> {
                         b.nav.setCheckedItem(R.id.nav_albums)
@@ -172,7 +176,9 @@ class MainActivity : BaseActivity() {
     private fun render() {
         val tiles: List<Tile>
         if (mode == 0) {
-            tiles = MediaRepo.albums(this, all, Prefs.albumSort, query, Prefs.showHidden).map { Tile(it.id, it.name, it.count.toString(), it.cover) }
+            albumList = MediaRepo.albums(this, all, Prefs.albumSort, query, Prefs.showHidden)
+            tiles = albumList.map { Tile(it.id, it.name, it.count.toString(), it.cover) }
+            selected = selected.filter { id -> albumList.any { it.id == id } }.toSet()
         } else {
             val hidden = Prefs.hiddenIds
             val ms = MediaRepo.moments(if (Prefs.showHidden) all else all.filter { it.bucketId !in hidden })
@@ -184,12 +190,46 @@ class MainActivity : BaseActivity() {
             b.empty.visibility = View.GONE
             adapter.tiles = tiles
         }
+        adapter.selected = if (mode == 0) selected else emptySet()
+        renderToolbar()
     }
+
+    private fun renderToolbar() {
+        b.toolbar.menu.clear()
+        if (mode == 0 && selected.isNotEmpty()) {
+            b.toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
+            b.toolbar.title = getString(R.string.sel_fmt, selected.size, albumList.size)
+            b.toolbar.inflateMenu(R.menu.menu_album_select)
+            b.toolbar.menu.findItem(R.id.action_rename_folder)?.isVisible = selected.size == 1
+            val allPinned = selected.all { it in Prefs.pinnedIds }
+            b.toolbar.menu.findItem(R.id.action_pin)?.setTitle(if (allPinned) R.string.unpin_top else R.string.pin_top)
+        } else {
+            b.toolbar.setNavigationIcon(R.drawable.ic_menu)
+            b.toolbar.setTitle(if (mode == 0) R.string.albums else R.string.moments)
+            b.toolbar.inflateMenu(R.menu.menu_main)
+            b.toolbar.menu.findItem(R.id.action_show_hidden)?.isChecked = Prefs.showHidden
+            b.toolbar.menu.findItem(R.id.action_sort)?.isVisible = mode == 0
+        }
+        tintBar(b.toolbar)
+    }
+
+    private fun toggle(key: Long) {
+        selected = if (key in selected) selected - key else selected + key
+        adapter.selected = selected
+        renderToolbar()
+    }
+
+    private fun clearSel() {
+        selected = emptySet()
+        adapter.selected = selected
+        renderToolbar()
+    }
+
+    private fun selectedAlbums() = albumList.filter { it.id in selected }
 
     private fun switchMode(m: Int) {
         mode = m
-        b.toolbar.setTitle(if (m == 0) R.string.albums else R.string.moments)
-        b.toolbar.menu.findItem(R.id.action_sort)?.isVisible = m == 0
+        selected = emptySet()
         setupGrid()
         render()
     }
@@ -236,6 +276,51 @@ class MainActivity : BaseActivity() {
                 render()
             }
             R.id.action_refresh -> refresh()
+            // ---- aksi untuk folder yang ditandai ----
+            R.id.action_delete -> ops.confirmDelete(
+                b.toolbar.findViewById<View>(R.id.action_delete) ?: b.toolbar,
+                all.filter { it.bucketId in selected }
+            ) {
+                clearSel()
+                refresh()
+            }
+            R.id.action_select_all -> {
+                selected = albumList.map { it.id }.toSet()
+                adapter.selected = selected
+                renderToolbar()
+            }
+            R.id.action_hide -> {
+                selectedAlbums().forEach { Prefs.addHidden(it.id, it.name) }
+                toast(R.string.hidden_done)
+                clearSel()
+                render()
+            }
+            R.id.action_pin -> {
+                Prefs.setPinned(selected, !selected.all { it in Prefs.pinnedIds })
+                clearSel()
+                render()
+            }
+            R.id.action_exclude -> {
+                val sel = selectedAlbums()
+                MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.exclude)
+                    .setMessage(sel.joinToString(", ") { it.name })
+                    .setPositiveButton(R.string.ok) { _, _ ->
+                        sel.forEach { Prefs.addExcluded(it.id, it.name) }
+                        toast(R.string.excluded_done)
+                        clearSel()
+                        refresh()
+                    }
+                    .setNegativeButton(R.string.cancel, null).show()
+            }
+            R.id.action_rename_folder -> selectedAlbums().singleOrNull()?.let { a ->
+                inputDialog(R.string.rename, a.name) { n ->
+                    ops.renameFolder(all.filter { it.bucketId == a.id }, n) {
+                        clearSel()
+                        refresh()
+                    }
+                }
+            }
             R.id.action_settings -> startActivity(Intent(this, SettingsActivity::class.java))
         }
         return true

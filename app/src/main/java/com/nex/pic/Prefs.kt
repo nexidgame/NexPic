@@ -57,6 +57,11 @@ object Prefs {
     val excludedEntries: List<String> get() = getSet("excluded_buckets").toList().sorted()
     fun addHidden(id: Long, name: String) = sp.edit().putStringSet("hidden_buckets", getSet("hidden_buckets") + "$id|$name").apply()
     fun addExcluded(id: Long, name: String) = sp.edit().putStringSet("excluded_buckets", getSet("excluded_buckets") + "$id|$name").apply()
+    val pinnedIds: Set<Long> get() = ids("pinned_buckets")
+    fun setPinned(keys: Set<Long>, pin: Boolean) {
+        val cur = getSet("pinned_buckets").filter { e -> e.substringBefore('|').toLongOrNull() !in keys }.toSet()
+        sp.edit().putStringSet("pinned_buckets", if (pin) cur + keys.map { "$it|" } else cur).apply()
+    }
     fun setExcluded(entries: Set<String>) = sp.edit().putStringSet("excluded_buckets", entries).apply()
 
     var lastBucket: String
