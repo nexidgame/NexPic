@@ -165,4 +165,5 @@
     <string name="pin_top">Di atas</string>
     <string name="unpin_top">Lepas dari atas</string>
     <string name="orient">Putar layar</string>
+    <string name="rename_hint" formatted="false">%Y=Year, %M=Month, %D=Day\n%h=Hour, %m=Minute, %s=Second</string>
 </resources>

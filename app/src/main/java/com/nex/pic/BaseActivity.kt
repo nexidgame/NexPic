@@ -25,6 +25,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nex.pic.databinding.DialogInputBinding
+import com.nex.pic.databinding.DialogRenameBinding
 
 object ThemeState { var version = 0 }
 object Session { var unlockedAt = -1L }
@@ -128,6 +129,22 @@ abstract class BaseActivity : AppCompatActivity() {
             .setNegativeButton(R.string.cancel, null)
         if (neutral != null) builder.setNeutralButton(neutral) { _, _ -> onNeutral?.invoke() }
         val dlg = builder.create()
+        dlg.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+        dlg.show()
+        v.input.requestFocus()
+    }
+
+    /** Ganti nama banyak file: kolom pola + keterangan %Y %M %D %h %m %s. */
+    protected fun patternDialog(initial: String, onOk: (String) -> Unit) {
+        val v = DialogRenameBinding.inflate(layoutInflater)
+        v.input.setText(initial)
+        v.input.selectAll()
+        val dlg = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.rename)
+            .setView(v.root)
+            .setPositiveButton(R.string.ok) { _, _ -> onOk(v.input.text.toString().trim()) }
+            .setNegativeButton(R.string.cancel, null)
+            .create()
         dlg.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
         dlg.show()
         v.input.requestFocus()

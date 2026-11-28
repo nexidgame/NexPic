@@ -199,8 +199,14 @@ class MediaListActivity : BaseActivity() {
             R.id.action_edit -> single()?.let { EditorActivity.start(this, it) }
             R.id.action_set_as -> single()?.let { ops.setAs(it, b.toolbar) }
             R.id.action_show_map -> single()?.let { ops.locate(it) }
-            R.id.action_rename -> single()?.let { m ->
-                inputDialog(R.string.rename, m.name.substringBeforeLast('.')) { n -> ops.rename(m, n) { afterOp() } }
+            R.id.action_rename -> {
+                val sel = selectedItems()
+                if (sel.size == 1) {
+                    val m = sel[0]
+                    inputDialog(R.string.rename, m.name.substringBeforeLast('.')) { n -> ops.rename(m, n) { afterOp() } }
+                } else if (sel.size > 1) {
+                    patternDialog(sel[0].name.substringBeforeLast('.')) { p -> ops.renameMany(sel, p) { afterOp() } }
+                }
             }
         }
         return true

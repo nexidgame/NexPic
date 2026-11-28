@@ -181,6 +181,59 @@ class MediaOps(private val act: ComponentActivity) {
         }
     }
 
+    /**
+     * Ganti nama banyak file dengan pola. %Y tahun, %M bulan, %D tanggal, %h jam, %m menit, %s detik
+     * (dari tanggal foto). Nama yang kembar diberi nomor urut _1, _2, ...
+     */
+    fun renameMany(items: List<MediaItem>, pattern: String, done: () -> Unit) {
+        val clean = pattern.trim().replace(Regex("[\\\\/:*?\"<>|]"), "_")
+        if (items.isEmpty() || clean.isEmpty()) return
+        val cal = java.util.Calendar.getInstance()
+        fun two(n: Int) = n.toString().padStart(2, '0')
+        val bases = items.map { m ->
+            cal.timeInMillis = m.dateTaken
+            clean.replace("%Y", cal.get(java.util.Calendar.YEAR).toString().padStart(4, '0'))
+                .replace("%M", two(cal.get(java.util.Calendar.MONTH) + 1))
+                .replace("%D", two(cal.get(java.util.Calendar.DAY_OF_MONTH)))
+                .replace("%h", two(cal.get(java.util.Calendar.HOUR_OF_DAY)))
+                .replace("%m", two(cal.get(java.util.Calendar.MINUTE)))
+                .replace("%s", two(cal.get(java.util.Calendar.SECOND)))
+        }
+        val total = HashMap<String, Int>()
+        items.indices.forEach { i ->
+            val key = bases[i].lowercase() + "." + items[i].name.substringAfterLast('.', "").lowercase()
+            total[key] = (total[key] ?: 0) + 1
+        }
+        val seen = HashMap<String, Int>()
+        val full = items.indices.map { i ->
+            val ext = items[i].name.substringAfterLast('.', "")
+            val key = bases[i].lowercase() + "." + ext.lowercase()
+            var base = bases[i]
+            if ((total[key] ?: 0) > 1) {
+                val n = (seen[key] ?: 0) + 1
+                seen[key] = n
+                base = base + "_" + n
+            }
+            if (ext.isNotEmpty()) "$base.$ext" else base
+        }
+        withWrite(items) {
+            bg.execute {
+                var ok = 0
+                items.indices.forEach { i ->
+                    try {
+                        cr.update(items[i].uri, ContentValues().apply { put(MediaStore.MediaColumns.DISPLAY_NAME, full[i]) }, null, null)
+                        ok++
+                    } catch (e: Exception) {
+                    }
+                }
+                ui {
+                    result(ok, items.size - ok)
+                    done()
+                }
+            }
+        }
+    }
+
     // ---------- rotasi ----------
     fun rotate(items: List<MediaItem>, deg: Int, done: () -> Unit) {
         val imgs = items.filter { !it.isVideo && (it.mime.contains("jpeg") || it.mime.contains("png") || it.mime.contains("webp")) }
